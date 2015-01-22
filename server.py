@@ -44,6 +44,20 @@ def upload_token():
         token = get_upload_token(key)
         return {'key':key, 'token':token}
 
+@app.route("/download-url")
+@mimerender(
+        default = 'json',
+        html = render_html,
+        xml  = render_xml,
+        json = render_json,
+        txt  = render_txt
+)
+def download_url():
+    if request.method == 'GET':
+        private_key = request.args.get('file')
+        url = get_download_url(private_key)
+        return {'key':private_key, 'url':url}
+
 def get_gossip():
     gossip = {}
     global counter

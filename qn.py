@@ -22,20 +22,28 @@ from qiniu import *
 # assert ret['key'] == key
 
 
-# 上传本地文件
+access_key = 'dbPhcCoD5oQKeaIays_NkoYVsNwQ-kuzEzuI-whv'
+secret_key = 'gbIZYLlYMkkrm55u2p7TXsL_Qx942q8lY_3gEHcG'
+bucket_name = 'fanfan-photo'
+
+def get_download_url(private_key):
+    q = Auth(access_key, secret_key)
+    base_url = 'http://%s/%s' % (bucket_name+'.7te7w9.com1.z0.glb.clouddn.com', private_key)
+    private_url = q.private_download_url(base_url, expires=3600)
+    #print(private_url)
+    return private_url
+
 
 def get_upload_token(key):
-    access_key = 'dbPhcCoD5oQKeaIays_NkoYVsNwQ-kuzEzuI-whv'
-    secret_key = 'gbIZYLlYMkkrm55u2p7TXsL_Qx942q8lY_3gEHcG'
     q = Auth(access_key, secret_key)
-
-    bucket_name = 'fanfan-photo'
     return q.upload_token(bucket_name, key)
+
 
 def get_unique_filename():
     unique_filename = str(hash(uuid.uuid4()) % 1000000000000) # 1T
     print(unique_filename)
     return unique_filename
+
 
 if __name__ == "__main__":
     localfile = __file__
