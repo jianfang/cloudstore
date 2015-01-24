@@ -3,7 +3,7 @@ __author__ = 'sid'
 from json import JSONEncoder
 from datetime import datetime
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, abort
 from flaskmimerender import mimerender
 from qn import *
 
@@ -15,6 +15,27 @@ render_txt = lambda message: message
 
 app = Flask(__name__)
 counter = 0
+
+idols = [
+    {
+        'name': 'No.1',
+        'stageName': 'No.1',
+        'iconUrl': '',
+        'unique': 0
+    }
+]
+
+gossips = [
+    {
+        'title': 'DUMMY',
+        'text': 'blahblah...,blahblah...blahblah...,blahblah...,blahblah...,blahblah...,blahblah...,blahblah...',
+        'time': str(datetime.now()),
+        'image': '',
+        'idol_id': 0,
+        'author_id': 0,
+        'unique': '0'
+    }
+]
 
 @app.route("/")
 @mimerender(
@@ -44,7 +65,7 @@ def upload_token():
         token = get_upload_token(key)
         return {'key':key, 'token':token}
 
-@app.route("/download-url")
+@app.route("/download-url/<file>")
 @mimerender(
         default = 'json',
         html = render_html,
@@ -52,9 +73,9 @@ def upload_token():
         json = render_json,
         txt  = render_txt
 )
-def download_url():
+def download_url(file):
     if request.method == 'GET':
-        private_key = request.args.get('file')
+        private_key = file
         url = get_download_url(private_key)
         return {'key':private_key, 'url':url}
 
@@ -66,29 +87,50 @@ def get_gossip():
     gossip['datetime'] = str(datetime.now())
     gossip['title'] = 'DUMMY'
     gossip['author'] = 'g1'
-    gossip['text'] = 'blahblah...'
+    gossip['text'] = 'blahblah...,blahblah...blahblah...,blahblah...,blahblah...,blahblah...,blahblah...,blahblah...'
     gossip['idol'] = 'XXX'
     return gossip
 
-@app.route("/api/gossips")
-@mimerender(
-        default = 'json',
-        html = render_html,
-        xml  = render_xml,
-        json = render_json,
-        txt  = render_txt
-)
-def gossips():
-    if request.method == 'GET':
-        gossip_list = []
-        for i in range(0, 10):
-            gossip_list.append(get_gossip())
-        gossip = {}
-        gossip['gossip'] = gossip_list
-        gossips = {}
-        gossips['gossips'] = gossip
-        gossips['stat'] = 'ok'
-        return gossips
+@app.route("/api/gossips", methods=['GET'])
+def get_gossips():
+    # gossip_list = []
+    # for i in range(0, 10):
+    #     gossip_list.append(get_gossip())
+    g = {}
+    g['gossip'] = gossips
+    gs = {}
+    gs['gossips'] = g
+    gs['stat'] = 'ok'
+    return jsonify(gs)
+
+@app.route("/api/gossips", methods=['POST'])
+def add_gossip():
+    if not request.json or not 'title' in request.json:
+        abort(400)
+    gossip = {
+        'title': request.json['title'],
+        'text': request.json.get('text', 'blahblah...,blahblah...blahblah...,blahblah...,blahblah...,blahblah...,blahblah...,blahblah...'),
+        'time': str(datetime.now()),
+        'image': request.json.get('image', ''),
+        'idol_id': request.json.get('idol_id', ''),
+        'author_id': request.json.get('author_id', ''),
+        'unique': str(int(gossips[-1]['unique']) + 1)
+    }
+    gossips.append(gossip)
+    return jsonify({'gossip': gossip}), 201
+
+@app.route('/api/idols', methods=['POST'])
+def add_idol():
+    if not request.json or not 'name' in request.json:
+        abort(400)
+    idol = {
+        'name': request.json['name'],
+        'stageName': request.json.get('stageName', request.json['name']),
+        'iconUrl': request.json.get('iconUrl', ""),
+        'unique': idols[-1]['unique'] + 1
+    }
+    idols.append(idol)
+    return jsonify({'idol': idol}), 201
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
