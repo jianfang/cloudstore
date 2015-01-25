@@ -1,10 +1,10 @@
 __author__ = 'sid'
 
-from json import JSONEncoder
 from datetime import datetime
 
 from flask import Flask, request, jsonify, abort
 from flaskmimerender import mimerender
+
 from qn import *
 
 render_xml = lambda message: '<message>%s</message>' % message
@@ -15,6 +15,13 @@ render_txt = lambda message: message
 
 app = Flask(__name__)
 counter = 0
+
+users = [
+    {
+        'name': 'First User',
+        'unique': 0
+    }
+]
 
 idols = [
     {
@@ -33,6 +40,16 @@ gossips = [
         'image': '',
         'idol_id': 0,
         'author_id': 0,
+        'unique': '0'
+    }
+]
+
+gossip_comments = [
+    {
+        'text': 'words in comment',
+        'gossip_id': 0,
+        'author_id': 0,
+        'time': str(datetime.now()),
         'unique': '0'
     }
 ]
@@ -103,6 +120,15 @@ def get_gossips():
     gs['stat'] = 'ok'
     return jsonify(gs)
 
+@app.route("/api/gossips/<int:id>/comments", methods=['GET'])
+def get_comments(id):
+    if id == '':
+        abort(400)
+    comment = [comment for comment in gossip_comments if comment['gossip_id'] == id]
+    if len(comment) == 0:
+        abort(404)
+    return jsonify({'comment': comment})
+
 @app.route("/api/gossips", methods=['POST'])
 def add_gossip():
     if not request.json or not 'title' in request.json:
@@ -133,4 +159,7 @@ def add_idol():
     return jsonify({'idol': idol}), 201
 
 if __name__ == "__main__":
+    from app.api_1_0 import api as api_1_0_blueprint
+    app.register_blueprint(api_1_0_blueprint, url_prefix='/api/v1.0')
+
     app.run(host='0.0.0.0')
