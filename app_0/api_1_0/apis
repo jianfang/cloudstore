@@ -1,0 +1,54 @@
+API Version 1.0 (/api/v1)
+
+Authentication
+https://hostname:5000/api/v1/register (POST)
+https://hostname:5000/api/v1/login (POST)
+https://hostname:5000/api/v1/logout (POST) @login_required
+https://hostname:5000/api/v1/register (POST)
+https://hostname:5000/api/v1/confirm @login_required
+https://hostname:5000/api/v1/confirm/<token> @login_required
+https://hostname:5000/api/v1/change-password (POST)
+https://hostname:5000/api/v1/reset (POST)
+https://hostname:5000/api/v1/reset/<token> (POST)
+https://hostname:5000/api/v1/change-email (POST)
+https://hostname:5000/api/v1/change-email/<token> (POST)
+https://hostname:5000/api/v1/token (GET)
+
+User
+https://hostname:5000/api/v1/users/ (GET)
+https://hostname:5000/api/v1/users/ (POST)
+https://hostname:5000/api/v1/users/<int:id> (GET)
+https://hostname:5000/api/v1/users/<int:id>/idols/ (GET)
+https://hostname:5000/api/v1/users/<int:id> (PUT)
+https://hostname:5000/api/v1/users/<int:id> (DELETE)
+
+
+Idol
+https://hostname:5000/api/v1/idols/ (GET)
+https://hostname:5000/api/v1/idols/ (POST)
+https://hostname:5000/api/v1/idols/<int:id> (GET)
+https://hostname:5000/api/v1/idols/<int:id>/posts/ (GET)
+https://hostname:5000/api/v1/idols/<int:id> (PUT)
+https://hostname:5000/api/v1/idols/<int:id> (DELETE)
+
+
+Post
+https://hostname:5000/api/v1/posts/ (GET)
+https://hostname:5000/api/v1/users/<int:id>/posts/ (GET)
+https://hostname:5000/api/v1/posts/<int:id> (GET)
+https://hostname:5000/api/v1/users/<int:id>/posts/ (POST)
+https://hostname:5000/api/v1/posts/<int:id> (PUT)
+https://hostname:5000/api/v1/posts/<int:id> (DELETE)
+
+
+Comment
+https://hostname:5000/api/v1/posts/<int:id>/comments/ (GET)
+https://hostname:5000/api/v1/comments/<int:id> (GET)
+https://hostname:5000/api/v1/posts/<int:id>/comments/ (POST)
+https://hostname:5000/api/v1/comments/<int:id> (PUT) ?
+https://hostname:5000/api/v1/comments/<int:id> (DELETE)
+
+
+download
+https://hostname:5000/api/v1/posts/<int:id>/comments/ (GET)
+

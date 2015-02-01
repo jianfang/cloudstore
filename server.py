@@ -159,7 +159,7 @@ def add_idol():
     return jsonify({'idol': idol}), 201
 
 if __name__ == "__main__":
-    from app.api_1_0 import api as api_1_0_blueprint
+    from app_0.api_1_0 import api as api_1_0_blueprint
     app.register_blueprint(api_1_0_blueprint, url_prefix='/api/v1.0')
 
     app.run(host='0.0.0.0')

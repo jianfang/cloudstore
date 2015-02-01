@@ -3,7 +3,7 @@ from flask.ext.httpauth import HTTPBasicAuth
 
 from ..models import User, AnonymousUser
 from . import api
-from app.api_1_0.errors import unauthorized, forbidden
+from app_0.api_1_0.errors import unauthorized, forbidden
 
 
 auth = HTTPBasicAuth()

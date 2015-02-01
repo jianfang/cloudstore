@@ -1,48 +1,42 @@
 __author__ = 'sid'
 
-from flask import Flask
-from flask.ext.bootstrap import Bootstrap
-from flask.ext.mail import Mail
-from flask.ext.moment import Moment
-from flask.ext.sqlalchemy import SQLAlchemy
-from flask.ext.login import LoginManager
-from flask.ext.pagedown import PageDown
-#from config import config
+import os
+from flask import Flask, jsonify, g
+from flask.ext.mongoalchemy import MongoAlchemy
+from .decorators import json, no_cache, rate_limit
 
-bootstrap = Bootstrap()
-mail = Mail()
-moment = Moment()
-db = SQLAlchemy()
-pagedown = PageDown()
-
-login_manager = LoginManager()
-login_manager.session_protection = 'strong'
-login_manager.login_view = 'auth.login'
-
+db = MongoAlchemy()
 
 def create_app(config_name):
+    """Create an application instance."""
     app = Flask(__name__)
-    #app.config.from_object(config[config_name])
-    #config[config_name].init_app(app)
 
-    bootstrap.init_app(app)
-    mail.init_app(app)
-    moment.init_app(app)
+    # apply configuration
+    cfg = os.path.join(os.getcwd(), 'config', config_name + '.py')
+    app.config.from_pyfile(cfg)
+
+    # initialize extensions
     db.init_app(app)
-    login_manager.init_app(app)
-    pagedown.init_app(app)
 
-    if not app.debug and not app.testing and not app.config['SSL_DISABLE']:
-        from flask.ext.sslify import SSLify
-        sslify = SSLify(app)
+    # register blueprints
+    from .api_1_0 import api as api_blueprint
+    app.register_blueprint(api_blueprint, url_prefix='/api/v1')
 
-    #from .main import main as main_blueprint
-    #app.register_blueprint(main_blueprint)
+    # register an after request handler
+    @app.after_request
+    def after_request(rv):
+        headers = getattr(g, 'headers', {})
+        rv.headers.extend(headers)
+        return rv
 
-    #from .auth import auth as auth_blueprint
-    #app.register_blueprint(auth_blueprint, url_prefix='/auth')
-
-    from .api_1_0 import api as api_1_0_blueprint
-    app.register_blueprint(api_1_0_blueprint, url_prefix='/api/v1.0')
+    # authentication token route
+    from .auth import auth
+    @app.route('/get-auth-token')
+    @auth.login_required
+    @rate_limit(1, 600)  # one call per 10 minute period
+    @no_cache
+    @json
+    def get_auth_token():
+        return {'token': g.user.generate_auth_token()}
 
     return app
