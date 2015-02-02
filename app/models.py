@@ -1,16 +1,28 @@
 __author__ = 'sid'
 
 from werkzeug.security import generate_password_hash, check_password_hash
+from mongoalchemy.document import Index
 from flask.ext.mongoalchemy import MongoAlchemy
 from flask.ext.login import UserMixin, AnonymousUserMixin
 from app.exceptions import ValidationError
 from . import db
 
+
 class User(db.Document):
+    # fields
     id = db.IntField()
-    email = db.StringField()
+    email = db.StringField(max_length=64)
     username = db.StringField()
     password_hash = db.StringField()
+    member_since = db.CreatedField()
+    confirmed = db.BoolField()
+
+    # optional fields
+    phone = db.StringField(required=False)
+
+    # index
+    email_index = Index().descending('email').unique()
+    username_index = Index().descending('username').unique()
 
     @staticmethod
     def generate_fake(count=100):
@@ -19,16 +31,14 @@ class User(db.Document):
 
         seed()
         for i in range(count):
-            u = User(email=forgery_py.internet.email_address(),
+            u = User(id=0,
+                     email=forgery_py.internet.email_address(),
                      username=forgery_py.internet.user_name(True),
                      password_hash=generate_password_hash(forgery_py.lorem_ipsum.word()),
-                     id=0
+                     confirmed=False
                      # password=forgery_py.lorem_ipsum.word()
-                     # confirmed=True,
-                     # name=forgery_py.name.full_name(),
                      # location=forgery_py.address.city(),
                      # about_me=forgery_py.lorem_ipsum.sentence(),
-                     # member_since=forgery_py.date.date(True)
             )
             u.save()
 
@@ -45,8 +55,9 @@ class User(db.Document):
     @staticmethod
     def add_user(email, username, password):
         id = 0
-        user = User(email=email, username=username,
-                    password_hash=generate_password_hash(password), id=id)
+        user = User(id=id, email=email, username=username,
+                    password_hash=generate_password_hash(password),
+                    confirmed=False)
         user.save()
         return user
 
@@ -57,4 +68,13 @@ class User(db.Document):
     @password.setter
     def password(self, password):
         self.password_hash = generate_password_hash(password)
+
+
+class Post(db.Document):
+    # fields
+    id = db.IntField()
+    title = db.StringField()
+    body = db.StringField()
+    timestamp = db.CreatedField()
+    author_id = db.StringField()
 
