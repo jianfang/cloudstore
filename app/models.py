@@ -6,7 +6,11 @@ from flask.ext.mongoalchemy import MongoAlchemy
 from flask.ext.login import UserMixin, AnonymousUserMixin
 from app.exceptions import ValidationError
 from . import db
-from .models import Post
+
+
+class Post(db.Document):
+    pass
+
 
 class User(db.Document):
     # fields
@@ -19,7 +23,7 @@ class User(db.Document):
 
     # optional fields
     phone = db.StringField(required=False)
-    posts = db.ListField(db.RefField(db.DocumentField(Post)))
+    posts = db.ListField(db.RefField(db.DocumentField(Post)), default_empty=True)
 
     # index
     email_index = Index().descending('email').unique()
@@ -70,6 +74,7 @@ class User(db.Document):
     def password(self, password):
         self.password_hash = generate_password_hash(password)
 
+
 class Post(db.Document):
     # fields
     id = db.IntField()
@@ -77,4 +82,11 @@ class Post(db.Document):
     body = db.StringField()
     timestamp = db.CreatedField()
     author = db.RefField(User)
+
+    @staticmethod
+    def add_post(uid, title, body):
+        id = 0
+        post = Post(id=id, title=title, body=body, author=None)
+        post.save()
+        return post
 
