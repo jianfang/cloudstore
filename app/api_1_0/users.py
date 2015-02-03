@@ -12,7 +12,7 @@ def main():
 @api.route('/register', methods=['POST'])
 def register():
     dict = request.args
-    #print(dict)
+    print(dict)
     email = dict['email']
     User.validate_email(email)
     username = dict['username']
