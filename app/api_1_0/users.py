@@ -27,4 +27,7 @@ def register():
 @api.route('/users/<id>', methods=['GET'])
 def get_user(id):
     uid = ObjectId(str(id))
-    return User.get_user(uid)
+    user = User.get_user(uid)
+    if user is not None:
+        return jsonify(user.to_json())
+

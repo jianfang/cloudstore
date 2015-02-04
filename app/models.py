@@ -67,6 +67,11 @@ class User(db.Document):
         user.save()
         return user
 
+    @staticmethod
+    def get_user(uid):
+        user = User.query.filter(User.mongo_id==uid).first()
+        return user
+
     @property
     def password(self):
         raise AttributeError('password is not a readable attribute')
@@ -74,6 +79,13 @@ class User(db.Document):
     @password.setter
     def password(self, password):
         self.password_hash = generate_password_hash(password)
+
+    def to_json(self):
+        json_user = {
+            'url': url_for('api.get_user', id=str(self.mongo_id), _external=True),
+            'username': self.username,
+        }
+        return json_user
 
 
 class Post(db.Document):
@@ -95,15 +107,14 @@ class Post(db.Document):
 
     @staticmethod
     def get_post(pid):
-        post = Post.query.filter(Post.mongo_id==pid).first()
-        if post is not None:
-            return post.to_json()
+        return Post.query.filter(Post.mongo_id==pid).first()
 
     def to_json(self):
         json_post = {
             'url': url_for('api.get_post', id=str(self.mongo_id), _external=True),
             'title': self.title,
             'body': self.body,
+            'create_at': self.timestamp,
             'author_url': url_for('api.get_user', id=str(self.author_id), _external=True)
         }
         return json_post

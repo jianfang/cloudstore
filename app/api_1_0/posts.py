@@ -19,7 +19,10 @@ def add_post(id):
 @api.route('/posts/<id>', methods=['GET'])
 def get_post(id):
     pid = ObjectId(str(id))
-    return Post.get_post(pid)
+    post = Post.get_post(pid)
+    if post is not None:
+        return jsonify(post.to_json())
+
 
 
 
