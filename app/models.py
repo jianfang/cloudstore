@@ -1,5 +1,6 @@
 __author__ = 'sid'
 
+from flask import url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 from mongoalchemy.document import Index
 from flask.ext.mongoalchemy import MongoAlchemy
@@ -23,7 +24,7 @@ class User(db.Document):
 
     # optional fields
     phone = db.StringField(required=False)
-    posts = db.ListField(db.RefField(db.DocumentField(Post)), default_empty=True)
+    posts = db.ListField(db.SRefField(Post), default_empty=True)
 
     # index
     email_index = Index().descending('email').unique()
@@ -81,12 +82,28 @@ class Post(db.Document):
     title = db.StringField()
     body = db.StringField()
     timestamp = db.CreatedField()
-    author = db.RefField(User)
+    author_id = db.SRefField(User)
 
     @staticmethod
     def add_post(uid, title, body):
-        id = 0
-        post = Post(id=id, title=title, body=body, author=None)
+        user = User.query.filter(User.mongo_id==uid).first()
+        post = Post(id=0, title=title, body=body, author_id=user.mongo_id)
         post.save()
+        user.posts.append(post.mongo_id)
+        user.save()
         return post
 
+    @staticmethod
+    def get_post(pid):
+        post = Post.query.filter(Post.mongo_id==pid).first()
+        if post is not None:
+            return post.to_json()
+
+    def to_json(self):
+        json_post = {
+            'url': url_for('api.get_post', id=str(self.mongo_id), _external=True),
+            'title': self.title,
+            'body': self.body,
+            'author_url': url_for('api.get_user', id=str(self.author_id), _external=True)
+        }
+        return json_post

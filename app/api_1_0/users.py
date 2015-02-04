@@ -1,5 +1,6 @@
 __author__ = 'sid'
 
+from bson import ObjectId
 from flask import request, jsonify
 from . import api
 from ..models import User
@@ -22,3 +23,8 @@ def register():
     if user is not None:
         return jsonify({'user_id': user.id, 'status': 'done'})
 
+
+@api.route('/users/<id>', methods=['GET'])
+def get_user(id):
+    uid = ObjectId(str(id))
+    return User.get_user(uid)
