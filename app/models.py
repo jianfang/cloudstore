@@ -1,7 +1,8 @@
 __author__ = 'sid'
 
-from flask import url_for
+from flask import url_for, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from mongoalchemy.document import Index
 from flask.ext.mongoalchemy import MongoAlchemy
 from flask.ext.login import UserMixin, AnonymousUserMixin
@@ -79,6 +80,22 @@ class User(db.Document):
     @password.setter
     def password(self, password):
         self.password_hash = generate_password_hash(password)
+
+    def verify_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+    def generate_auth_token(self, expires_in=3600):
+        s = Serializer(current_app.config['SECRET_KEY'], expires_in=expires_in)
+        return s.dumps({'username': self.username}).decode('utf-8')
+
+    @staticmethod
+    def verify_auth_token(token):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except:
+            return None
+        return User.query.get(data['username'])
 
     def to_json(self):
         json_user = {

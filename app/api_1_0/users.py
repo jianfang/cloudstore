@@ -6,9 +6,11 @@ from . import api
 from ..models import User
 from ..exceptions import ValidationError
 
+
 @api.route('/')
 def main():
     return jsonify({'message':'hello'})
+
 
 @api.route('/register', methods=['POST'])
 def register():
@@ -36,11 +38,10 @@ def login():
     dict = request.args
     print(dict)
     email = dict['email']
-    User.validate_email(email)
-    username = dict['username']
-    User.validate_username(username)
     password = dict['password']
-    user = User.add_user(email, username, password)
-    if user is not None:
-        return jsonify({'user_id': user.id, 'status': 'done'})
+    user = User.query.filter_by(email=email).first()
+    #    if user is not None and user.verify_password(password):
+    #user = User.add_user(email, username, password)
+    #if user is not None:
+    #    return jsonify({'user_id': user.id, 'status': 'done'})
 
