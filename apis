@@ -4,7 +4,6 @@ Authentication
 https://hostname:5000/api/v1/register (POST)
 https://hostname:5000/api/v1/login (POST)
 https://hostname:5000/api/v1/logout (POST) @login_required
-https://hostname:5000/api/v1/register (POST)
 https://hostname:5000/api/v1/confirm @login_required
 https://hostname:5000/api/v1/confirm/<token> @login_required
 https://hostname:5000/api/v1/change-password (POST)

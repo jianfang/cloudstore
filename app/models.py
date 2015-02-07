@@ -95,7 +95,7 @@ class User(db.Document):
             data = s.loads(token)
         except:
             return None
-        return User.query.get(data['username'])
+        return User.query.filter(User.username==data['username']).first()
 
     def to_json(self):
         json_user = {
