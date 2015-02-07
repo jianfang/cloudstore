@@ -14,7 +14,8 @@ if __name__ == "__main__":
     app = create_app(os.getenv('FLASK_CONFIG') or 'development')
 
     # create a development user
-    if User.query.filter_by(username='dev') is None:
+    user = User.query.filter(User.username=='dev').first()
+    if user is None:
         User.add_user('dev@app.com', 'dev', 'dev_password')
 
     app.run(host='0.0.0.0', debug=True)
