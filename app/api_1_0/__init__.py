@@ -22,5 +22,5 @@ def after_request(rv):
     return rv
 
 #from . import authentication, posts, comments, errors
-from . import users, posts, errors
+from . import users, idols, posts, errors
 

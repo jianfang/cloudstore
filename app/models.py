@@ -33,6 +33,29 @@ class Idol(db.Document):
     # index
     name_index = Index().descending('name').unique()
 
+    @staticmethod
+    def add_idol(name, stage_name, birthday):
+        id = 0
+        from datetime import datetime
+        date_object = datetime.strptime(birthday, '%Y/%m/%d')
+        idol = Idol(id=id, name=name, stage_name=stage_name,
+                    birthday=date_object)
+        idol.save()
+        return idol
+
+    @staticmethod
+    def get_idol(iid):
+        idol = Idol.query.filter(Idol.mongo_id == iid).first()
+        return idol
+
+    def to_json(self):
+        json_idol = {
+            'url': url_for('api.get_idol', id=str(self.mongo_id), _external=True),
+            'name': self.name,
+            'stage_name': self.stage_name
+        }
+        return json_idol
+
 
 class User(db.Document):
     # fields
@@ -90,7 +113,7 @@ class User(db.Document):
 
     @staticmethod
     def get_user(uid):
-        user = User.query.filter(User.mongo_id==uid).first()
+        user = User.query.filter(User.mongo_id == uid).first()
         return user
 
     @property
