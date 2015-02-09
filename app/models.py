@@ -15,6 +15,26 @@ class Post(db.Document):
 
 
 class User(db.Document):
+    pass
+
+
+class Idol(db.Document):
+    # fields
+    id = db.IntField()
+    name = db.StringField()
+    stage_name = db.StringField()
+    birthday = db.DateTimeField()
+    member_since = db.CreatedField()
+
+    # optional fields
+    posts = db.ListField(db.SRefField(Post), default_empty=True)
+    followers = db.ListField(db.SRefField(User), default_empty=True)
+
+    # index
+    name_index = Index().descending('name').unique()
+
+
+class User(db.Document):
     # fields
     id = db.IntField()
     email = db.StringField(max_length=64)
