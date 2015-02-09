@@ -23,7 +23,7 @@ def unauthorized():
 @auth_token.verify_password
 def verify_auth_token(token, unused):
     if current_app.config.get('IGNORE_AUTH') is True:
-        g.user = User.query.filter_by(username='dev')
+        g.user = User.query.filter_by(username='dev').first()
     else:
         g.user = User.verify_auth_token(token)
     return g.user is not None
