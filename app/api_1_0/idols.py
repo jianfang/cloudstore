@@ -17,6 +17,15 @@ def add_idol():
         return jsonify({'name': idol.name, 'status': 'done'})
 
 
+@api.route('/idols/', methods=['GET'])
+def get_idols():
+    idols = []
+    for idol in Idol.query.filter():
+        if idol is not None:
+            idols.append(idol.to_json())
+    return jsonify({'idols': idols})
+
+
 @api.route('/idols/<id>', methods=['GET'])
 def get_idol(id):
     iid = ObjectId(str(id))
