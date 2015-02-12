@@ -1,11 +1,17 @@
 __author__ = 'sid'
 
 import os
-from flask import Flask, jsonify, g
+from flask import Flask, request, jsonify, g
 from flask.ext.mongoalchemy import MongoAlchemy
+from .exceptions import ValidationError
 from .decorators import json, no_cache, rate_limit
 
 db = MongoAlchemy()
+
+def bad_request(message):
+    response = jsonify({'error': 'bad request', 'message': message})
+    response.status_code = 400
+    return response
 
 def create_app(config_name):
     """Create an application instance."""
@@ -28,6 +34,28 @@ def create_app(config_name):
         headers = getattr(g, 'headers', {})
         rv.headers.extend(headers)
         return rv
+
+    @app.errorhandler(ValidationError)
+    def validation_error(e):
+        return bad_request(e.args[0])
+
+    # register route
+    from .models import User
+    @app.route('/register', methods=['POST'])
+    @rate_limit(10, 60)  # one call per 1 minute period
+    @no_cache
+    @json
+    def register():
+        dict = request.args
+        print(dict)
+        #email = dict['email']
+        #User.validate_email(email)
+        username = dict['username']
+        User.validate_username(username)
+        password = dict['password']
+        user = User.add_user('', username, password)
+        if user is not None:
+            return {'user_id': user.id, 'status': 'done'}
 
     # authentication token route
     from .auth import auth
