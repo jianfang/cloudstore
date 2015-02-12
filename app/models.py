@@ -24,7 +24,7 @@ class Idol(db.Document):
     name = db.StringField()
     stage_name = db.StringField()
     birthday = db.DateTimeField()
-    member_since = db.CreatedField()
+    time_added = db.CreatedField()
 
     # optional fields
     posts = db.ListField(db.SRefField(Post), default_empty=True)
