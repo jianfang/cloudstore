@@ -55,7 +55,11 @@ def create_app(config_name):
         password = dict['password']
         user = User.add_user('', username, password)
         if user is not None:
-            return {'user_id': user.id, 'status': 'done'}
+            return {'token': user.generate_auth_token(),
+                    'user_id': str(user.mongo_id),
+                    'status': 'done'}
+        else:
+            return {'status': 'failed'}
 
     # authentication token route
     from .auth import auth
