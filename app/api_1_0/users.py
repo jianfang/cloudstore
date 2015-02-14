@@ -11,6 +11,13 @@ from ..exceptions import ValidationError
 def main():
     return jsonify({'message':'hello'})
 
+@api.route('/users/', methods=['GET'])
+def get_users():
+    users = []
+    for user in User.query.filter():
+        if user is not None:
+            users.append(user.to_json())
+    return jsonify({'users': users})
 
 @api.route('/users/<id>', methods=['GET'])
 def get_user(id):
