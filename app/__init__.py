@@ -46,7 +46,7 @@ def create_app(config_name):
     @no_cache
     @json
     def register():
-        dict = request.args
+        dict = request.values
         print(dict)
         #email = dict['email']
         #User.validate_email(email)
