@@ -8,8 +8,8 @@ from .decorators import json, no_cache, rate_limit
 
 db = MongoAlchemy()
 
-def bad_request(message):
-    response = jsonify({'error': 'bad request', 'message': message})
+def bad_request(message, code):
+    response = jsonify({'error': 'bad request', 'message': message, 'code': code})
     response.status_code = 400
     return response
 
@@ -37,7 +37,7 @@ def create_app(config_name):
 
     @app.errorhandler(ValidationError)
     def validation_error(e):
-        return bad_request(e.args[0])
+        return bad_request(e.args[0], e.args[1])
 
     # register route
     from .models import User

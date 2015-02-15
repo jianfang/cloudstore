@@ -100,7 +100,7 @@ class User(db.Document):
     @staticmethod
     def validate_username(username):
         if User.query.filter_by(username=username).first():
-            raise ValidationError('Username already in use.')
+            raise ValidationError('Username already in use.', 'USER_ALREADY_EXISTS')
 
     @staticmethod
     def add_user(email, username, password):
