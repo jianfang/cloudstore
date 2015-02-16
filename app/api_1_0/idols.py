@@ -12,7 +12,8 @@ def add_idol():
     name = dict['name']
     stage_name = dict['stage_name']
     birthday = dict['birthday']
-    idol = Idol.add_idol(name, stage_name, birthday)
+    icon_url = dict['icon_url']
+    idol = Idol.add_idol(name, stage_name, birthday, icon_url)
     if idol is not None:
         return jsonify({'name': idol.name, 'status': 'done'})
 

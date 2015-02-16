@@ -25,6 +25,7 @@ class Idol(db.Document):
     stage_name = db.StringField()
     birthday = db.DateTimeField()
     time_added = db.CreatedField()
+    icon_url = db.StringField()
 
     # optional fields
     posts = db.ListField(db.SRefField(Post), default_empty=True)
@@ -34,12 +35,12 @@ class Idol(db.Document):
     name_index = Index().descending('name').unique()
 
     @staticmethod
-    def add_idol(name, stage_name, birthday):
+    def add_idol(name, stage_name, birthday, icon_url):
         id = 0
         from datetime import datetime
         date_object = datetime.strptime(birthday, '%Y/%m/%d')
         idol = Idol(id=id, name=name, stage_name=stage_name,
-                    birthday=date_object)
+                    birthday=date_object, icon_url=icon_url)
         idol.save()
         return idol
 
@@ -52,7 +53,9 @@ class Idol(db.Document):
         json_idol = {
             'url': url_for('api.get_idol', id=str(self.mongo_id), _external=True),
             'name': self.name,
-            'stage_name': self.stage_name
+            'stage_name': self.stage_name,
+            'follower_count': len(self.followers),
+            'icon_url': self.icon_url
         }
         return json_idol
 
