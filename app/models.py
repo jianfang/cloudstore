@@ -45,6 +45,11 @@ class Idol(db.Document):
         return idol
 
     @staticmethod
+    def validate_idol(name):
+        if Idol.query.filter_by(name=name).first():
+            raise ValidationError('Idol already exists.', 'IDOL_ALREADY_EXISTS')
+
+    @staticmethod
     def get_idol(iid):
         idol = Idol.query.filter(Idol.mongo_id == iid).first()
         return idol

@@ -7,9 +7,10 @@ from ..models import Idol
 
 @api.route('/idols/', methods=['POST'])
 def add_idol():
-    dict = request.args
+    dict = request.values
     print(dict)
     name = dict['name']
+    Idol.validate_idol(name)
     stage_name = dict['stage_name']
     birthday = dict['birthday']
     icon_url = dict['icon_url']
@@ -24,7 +25,12 @@ def get_idols():
     for idol in Idol.query.filter():
         if idol is not None:
             idols.append(idol.to_json())
-    return jsonify({'idols': idols})
+    g = {}
+    g['idol'] = idols
+    gs = {}
+    gs['idols'] = g
+    gs['stat'] = 'ok'
+    return jsonify(gs)
 
 
 @api.route('/idols/<id>', methods=['GET'])

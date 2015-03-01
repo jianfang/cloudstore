@@ -8,6 +8,10 @@ def bad_request(message):
     response.status_code = 400
     return response
 
+def bad_request(message, code):
+    response = jsonify({'error': 'bad request', 'message': message, 'code': code})
+    response.status_code = 400
+    return response
 
 def unauthorized(message):
     response = jsonify({'error': 'unauthorized', 'message': message})
@@ -22,4 +26,8 @@ def forbidden(message):
 
 @api.errorhandler(ValidationError)
 def validation_error(e):
-    return bad_request(e.args[0])
+    if len(e.args) == 1:
+        return bad_request(e.args[0])
+    elif len(e.args) == 2:
+        return bad_request(e.args[0], e.args[1])
+
