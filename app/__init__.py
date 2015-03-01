@@ -6,6 +6,8 @@ from flask.ext.mongoalchemy import MongoAlchemy
 from .exceptions import ValidationError
 from .decorators import json, no_cache, rate_limit
 
+from qn import *
+
 db = MongoAlchemy()
 
 def bad_request(message, code):
@@ -13,20 +15,7 @@ def bad_request(message, code):
     response.status_code = 400
     return response
 
-def create_app(config_name):
-    """Create an application instance."""
-    app = Flask(__name__)
-
-    # apply configuration
-    cfg = os.path.join(os.getcwd(), 'config', config_name + '.py')
-    app.config.from_pyfile(cfg)
-
-    # initialize extensions
-    db.init_app(app)
-
-    # register blueprints
-    from .api_1_0 import api as api_blueprint
-    app.register_blueprint(api_blueprint, url_prefix='/api/v1')
+def register_app_routes(app):
 
     # register an after request handler
     @app.after_request
@@ -72,5 +61,35 @@ def create_app(config_name):
         import time
         time.sleep(5)
         return {'token': g.user.generate_auth_token(), 'status': 'done'}
+
+    # authentication token route
+    from .auth import auth_token
+    @app.route('/get-upload-token')
+    @auth_token.login_required
+    @rate_limit(10, 60)  # one call per 1 minute period
+    @no_cache
+    @json
+    def get_upload_token():
+        key = get_unique_filename()
+        token = get_upload_token(key)
+        return {'key':key, 'token':token, 'status': 'done'}
+
+
+def create_app(config_name):
+    """Create an application instance."""
+    app = Flask(__name__)
+
+    # apply configuration
+    cfg = os.path.join(os.getcwd(), 'config', config_name + '.py')
+    app.config.from_pyfile(cfg)
+
+    # initialize extensions
+    db.init_app(app)
+
+    # register blueprints
+    from .api_1_0 import api as api_blueprint
+    app.register_blueprint(api_blueprint, url_prefix='/api/v1')
+
+    register_app_routes(app)
 
     return app
