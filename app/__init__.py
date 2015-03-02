@@ -70,8 +70,8 @@ def register_app_routes(app):
     @no_cache
     @json
     def get_upload_token():
-        key = get_unique_filename()
-        token = get_upload_token(key)
+        key = QiniuCloud.get_unique_filename()
+        token = QiniuCloud.get_upload_token(key)
         return {'key':key, 'token':token, 'status': 'done'}
 
 
