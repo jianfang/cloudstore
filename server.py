@@ -78,8 +78,8 @@ def hello():
 )
 def upload_token():
     if request.method == 'GET':
-        key = get_unique_filename()
-        token = get_upload_token(key)
+        key = QiniuCloud.get_unique_filename()
+        token = QiniuCloud.get_upload_token(key)
         return {'key':key, 'token':token}
 
 @app.route("/download-url/<file>")
@@ -93,7 +93,7 @@ def upload_token():
 def download_url(file):
     if request.method == 'GET':
         private_key = file
-        url = get_download_url(private_key)
+        url = QiniuCloud.get_download_url(private_key)
         return {'key':private_key, 'url':url}
 
 def get_gossip():
