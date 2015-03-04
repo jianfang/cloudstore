@@ -10,13 +10,15 @@ from qn import *
 
 db = MongoAlchemy()
 
+
 def bad_request(message, code):
-    response = jsonify({'error': 'bad request', 'message': message, 'code': code})
+    response = jsonify(
+        {'error': 'bad request', 'message': message, 'code': code})
     response.status_code = 400
     return response
 
-def register_app_routes(app):
 
+def register_app_routes(app):
     # register an after request handler
     @app.after_request
     def after_request(rv):
@@ -30,6 +32,7 @@ def register_app_routes(app):
 
     # register route
     from .models import User
+
     @app.route('/register', methods=['POST'])
     @rate_limit(10, 60)  # one call per 1 minute period
     @no_cache
@@ -37,7 +40,7 @@ def register_app_routes(app):
     def register():
         dict = request.values
         print(dict)
-        #email = dict['email']
+        # email = dict['email']
         #User.validate_email(email)
         username = dict['username']
         User.validate_username(username)
@@ -52,6 +55,7 @@ def register_app_routes(app):
 
     # authentication token route
     from .auth import auth
+
     @app.route('/get-auth-token')
     @auth.login_required
     @rate_limit(1, 60)  # one call per 1 minute period
@@ -59,20 +63,31 @@ def register_app_routes(app):
     @json
     def get_auth_token():
         import time
+
         time.sleep(5)
         return {'token': g.user.generate_auth_token(), 'status': 'done'}
 
-    # authentication token route
     from .auth import auth_token
+
     @app.route('/get-upload-token')
     @auth_token.login_required
-    @rate_limit(10, 60)  # one call per 1 minute period
+    @rate_limit(10, 60)  # 10 call per 1 minute period
     @no_cache
     @json
     def get_upload_token():
         key = QiniuCloud.get_unique_filename()
         token = QiniuCloud.get_upload_token(key)
-        return {'key':key, 'token':token, 'status': 'done'}
+        return {'key': key, 'token': token, 'status': 'done'}
+
+    @app.route("/download-url/<file>")
+    @auth_token.login_required
+    @rate_limit(10, 60)  # 10 call per 1 minute period
+    @no_cache
+    @json
+    def download_url(file):
+        private_key = file
+        url = QiniuCloud.get_download_url(private_key)
+        return {'key': private_key, 'url': url, 'status': 'done'}
 
 
 def create_app(config_name):
@@ -88,6 +103,7 @@ def create_app(config_name):
 
     # register blueprints
     from .api_1_0 import api as api_blueprint
+
     app.register_blueprint(api_blueprint, url_prefix='/api/v1')
 
     register_app_routes(app)
