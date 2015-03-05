@@ -20,6 +20,7 @@ https://hostname:5000/api/v1/users/<int:id> (GET)
 https://hostname:5000/api/v1/users/<int:id>/idols/ (GET)
 https://hostname:5000/api/v1/users/<int:id> (PUT)
 https://hostname:5000/api/v1/users/<int:id> (DELETE)
+https://hostname:5000/api/v1/users/<id>/follow?idol= (POST)
 
 
 Idol

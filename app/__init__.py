@@ -65,7 +65,9 @@ def register_app_routes(app):
         import time
 
         time.sleep(5)
-        return {'token': g.user.generate_auth_token(), 'status': 'done'}
+        return {'token': g.user.generate_auth_token(),
+                'user_id': str(g.user.mongo_id),
+                'status': 'done'}
 
     from .auth import auth_token
 

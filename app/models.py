@@ -76,10 +76,11 @@ class User(db.Document):
 
     # optional fields
     phone = db.StringField(required=False)
+    followed = db.ListField(db.SRefField(Idol), default_empty=True)
     posts = db.ListField(db.SRefField(Post), default_empty=True)
 
     # index
-    email_index = Index().descending('email').unique()
+    #email_index = Index().descending('email').unique()
     username_index = Index().descending('username').unique()
 
     @staticmethod
