@@ -56,6 +56,7 @@ class Idol(db.Document):
 
     def to_json(self):
         json_idol = {
+            'id': str(self.mongo_id),
             'url': url_for('api.get_idol', id=str(self.mongo_id), _external=True),
             'name': self.name,
             'stage_name': self.stage_name,
@@ -151,8 +152,10 @@ class User(db.Document):
 
     def to_json(self):
         json_user = {
+            'id': str(self.mongo_id),
             'url': url_for('api.get_user', id=str(self.mongo_id), _external=True),
             'username': self.username,
+            'followed': [str(f) for f in self.followed]
         }
         return json_user
 

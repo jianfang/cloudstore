@@ -48,7 +48,7 @@ def register_app_routes(app):
         user = User.add_user('', username, password)
         if user is not None:
             return {'token': user.generate_auth_token(),
-                    'user_id': str(user.mongo_id),
+                    'user': user.to_json(),
                     'status': 'done'}
         else:
             return {'status': 'failed'}
@@ -63,10 +63,9 @@ def register_app_routes(app):
     @json
     def get_auth_token():
         import time
-
         time.sleep(5)
         return {'token': g.user.generate_auth_token(),
-                'user_id': str(g.user.mongo_id),
+                'user': g.user.to_json(),
                 'status': 'done'}
 
     from .auth import auth_token
