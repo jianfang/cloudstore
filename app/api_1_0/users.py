@@ -36,9 +36,33 @@ def follow(id):
         uid = ObjectId(str(id))
         user = User.get_user(uid)
         if user is not None:
-            user.followed.add(idol)
-            user.save()
-            idol.followers.add(user)
-            idol.save()
-        return jsonify(user.to_json())
+            if not (idol.mongo_id in user.followed):
+                user.followed.append(idol.mongo_id)
+                user.save()
+            if not (user.mongo_id in idol.followers):
+                idol.followers.append(user.mongo_id)
+                idol.save()
+            return jsonify({'status': 'done'})
 
+    return jsonify({'status': 'failed'})
+
+
+@api.route('/users/<id>/unfollow', methods=['POST'])
+def unfollow(id):
+    dict = request.values
+    idol_id = dict['idol']
+    iid = ObjectId(idol_id)
+    idol = Idol.get_idol(iid)
+    if idol is not None:
+        uid = ObjectId(str(id))
+        user = User.get_user(uid)
+        if user is not None:
+            if idol.mongo_id in user.followed:
+                user.followed.remove(idol.mongo_id)
+                user.save()
+            if user.mongo_id in idol.followers:
+                idol.followers.remove(user.mongo_id)
+                idol.save()
+            return jsonify({'status': 'done'})
+
+    return jsonify({'status': 'failed'})
