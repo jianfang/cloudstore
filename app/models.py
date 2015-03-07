@@ -165,16 +165,19 @@ class Post(db.Document):
     id = db.IntField()
     title = db.StringField()
     body = db.StringField()
+    photo = db.StringField()
     timestamp = db.CreatedField()
-    author_id = db.SRefField(User)
+    author = db.SRefField(User)
+    idol = db.SRefField(Idol)
 
     @staticmethod
-    def add_post(uid, title, body):
-        user = User.query.filter(User.mongo_id==uid).first()
-        post = Post(id=0, title=title, body=body, author_id=user.mongo_id)
+    def add_post(user, idol, body, photo):
+        post = Post(id=0, title='', body=body, author=user.mongo_id, idol=idol.mongo_id, photo=photo)
         post.save()
         user.posts.append(post.mongo_id)
         user.save()
+        idol.posts.append(post.mongo_id)
+        idol.save()
         return post
 
     @staticmethod

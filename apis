@@ -21,7 +21,8 @@ https://hostname:5000/api/v1/users/<int:id>/idols/ (GET)
 https://hostname:5000/api/v1/users/<int:id> (PUT)
 https://hostname:5000/api/v1/users/<int:id> (DELETE)
 https://hostname:5000/api/v1/users/<id>/follow?idol= (POST)
-
+https://hostname:5000/api/v1/users/<id>/unfollow?idol= (POST)
+https://hostname:5000/api/v1/users/<id>/post?idol=&body=&photo= (POST)
 
 Idol
 https://hostname:5000/api/v1/idols/ (GET)
@@ -36,7 +37,6 @@ Post
 https://hostname:5000/api/v1/posts/ (GET)
 https://hostname:5000/api/v1/users/<int:id>/posts/ (GET)
 https://hostname:5000/api/v1/posts/<int:id> (GET)
-https://hostname:5000/api/v1/users/<int:id>/posts/ (POST)
 https://hostname:5000/api/v1/posts/<int:id> (PUT)
 https://hostname:5000/api/v1/posts/<int:id> (DELETE)
 

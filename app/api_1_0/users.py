@@ -3,7 +3,7 @@ __author__ = 'sid'
 from bson import ObjectId
 from flask import request, jsonify
 from . import api
-from ..models import User, Idol
+from ..models import User, Idol, Post
 from ..exceptions import ValidationError
 
 
@@ -70,3 +70,22 @@ def unfollow(id):
             return jsonify({'status': 'done'})
 
     return jsonify({'status': 'failed'})
+
+
+@api.route('/users/<id>/post', methods=['POST'])
+def add_post(id):
+    dict = request.values
+    idol_id = dict['idol']
+    iid = ObjectId(idol_id)
+    idol = Idol.get_idol(iid)
+    if idol is not None:
+        uid = ObjectId(str(id))
+        user = User.get_user(uid)
+        if user is not None:
+            body = dict['body']
+            photo = dict['photo']
+            new_post = Post.add_post(user, idol, body, photo)
+            return jsonify({'post_id': str(new_post.mongo_id), 'status': 'done'})
+
+    return jsonify({'status': 'failed'})
+
