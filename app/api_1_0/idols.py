@@ -21,13 +21,13 @@ def add_idol():
 
 @api.route('/idols/', methods=['GET'])
 def get_idols():
+    gs = {}
+    g = {}
     idols = []
     for idol in Idol.query.filter():
         if idol is not None:
             idols.append(idol.to_json())
-    g = {}
     g['idol'] = idols
-    gs = {}
     gs['idols'] = g
     gs['stat'] = 'ok'
     return jsonify(gs)
@@ -35,10 +35,16 @@ def get_idols():
 
 @api.route('/idols/<id>', methods=['GET'])
 def get_idol(id):
+    gs = {}
+    g = {}
+    idols = []
     iid = ObjectId(str(id))
     idol = Idol.get_idol(iid)
     if idol is not None:
-        return jsonify(idol.to_json())
-
+        idols.append(idol.to_json())
+    g['idol'] = idols
+    gs['idols'] = g
+    gs['stat'] = 'ok'
+    return jsonify(gs)
 
 

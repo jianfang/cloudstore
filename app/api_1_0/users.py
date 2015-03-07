@@ -19,12 +19,16 @@ def get_users():
             users.append(user.to_json())
     return jsonify({'users': users})
 
+
 @api.route('/users/<id>', methods=['GET'])
 def get_user(id):
     uid = ObjectId(str(id))
     user = User.get_user(uid)
     if user is not None:
-        return jsonify(user.to_json())
+        return jsonify({'user': user.to_json(),
+                        'status': 'done'})
+    return jsonify({'status': 'failed'})
+
 
 @api.route('/users/<id>/follow', methods=['POST'])
 def follow(id):

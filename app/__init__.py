@@ -82,7 +82,7 @@ def register_app_routes(app):
 
     @app.route("/download-url/<file>")
     @auth_token.login_required
-    @rate_limit(10, 60)  # 10 call per 1 minute period
+    @rate_limit(60, 60)  # 10 call per 1 minute period
     @no_cache
     @json
     def download_url(file):
