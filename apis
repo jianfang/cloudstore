@@ -28,7 +28,7 @@ Idol
 https://hostname:5000/api/v1/idols/ (GET)
 https://hostname:5000/api/v1/idols/ (POST)
 https://hostname:5000/api/v1/idols/<int:id> (GET)
-https://hostname:5000/api/v1/idols/<int:id>/posts/ (GET)
+https://hostname:5000/api/v1/idols/<id>/posts/ (GET)
 https://hostname:5000/api/v1/idols/<int:id> (PUT)
 https://hostname:5000/api/v1/idols/<int:id> (DELETE)
 

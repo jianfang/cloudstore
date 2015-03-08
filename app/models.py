@@ -13,8 +13,10 @@ from . import db
 class Post(db.Document):
     pass
 
-
 class User(db.Document):
+    pass
+
+class Comment(db.Document):
     pass
 
 
@@ -164,11 +166,12 @@ class Post(db.Document):
     # fields
     id = db.IntField()
     title = db.StringField()
-    body = db.StringField()
+    text = db.StringField()
     photo = db.StringField()
     timestamp = db.CreatedField()
     author = db.SRefField(User)
     idol = db.SRefField(Idol)
+    comments = db.ListField(db.SRefField(Comment), default_empty=True)
 
     @staticmethod
     def add_post(user, idol, body, photo):
@@ -185,11 +188,49 @@ class Post(db.Document):
         return Post.query.filter(Post.mongo_id==pid).first()
 
     def to_json(self):
+        author = User.get_user(self.author)
+
         json_post = {
+            'id': str(self.mongo_id),
             'url': url_for('api.get_post', id=str(self.mongo_id), _external=True),
             'title': self.title,
-            'body': self.body,
+            'text': self.text,
+            'photo': self.photo,
             'create_at': self.timestamp,
-            'author_url': url_for('api.get_user', id=str(self.author_id), _external=True)
+            'author': {
+                'id': str(self.author),
+                'name': author.username
+            },
+            'comment_count': len(self.comments)
         }
         return json_post
+
+
+class Comment(db.Document):
+    #fields
+    id = db.IntField()
+    body = db.StringField()
+    timestamp = db.CreatedField()
+    author = db.SRefField(User)
+
+    @staticmethod
+    def add_comment(user, post, body):
+        comment = Comment(id=0, body=body, author=user.mongo_id)
+        comment.save()
+        user.comments.append(comment.mongo_id)
+        user.save()
+        post.comments.append(comment.mongo_id)
+        post.save()
+        return comment
+
+    @staticmethod
+    def get_comment(cid):
+        return Comment.query.filter(Comment.mongo_id==cid).first()
+
+    def to_json(self):
+        json_comment = {
+            'body': self.body,
+            'create_at': self.timestamp,
+            'author': str(self.author)
+        }
+        return json_comment

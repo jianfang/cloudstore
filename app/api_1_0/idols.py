@@ -3,7 +3,7 @@ __author__ = 'sid'
 from bson import ObjectId
 from flask import request, jsonify
 from . import api
-from ..models import Idol
+from ..models import Idol, Post
 
 @api.route('/idols/', methods=['POST'])
 def add_idol():
@@ -48,3 +48,19 @@ def get_idol(id):
     return jsonify(gs)
 
 
+@api.route('/idols/<id>/posts/', methods=['GET'])
+def get_idol_posts(id):
+    gs = {}
+    g = {}
+    posts = []
+    iid = ObjectId(str(id))
+    idol = Idol.get_idol(iid)
+    if idol is not None:
+        for p in idol.posts:
+            pid = ObjectId(str(p))
+            post = Post.get_post(pid)
+            posts.append(post.to_json())
+    g['post'] = posts
+    gs['posts'] = g
+    gs['stat'] = 'ok'
+    return jsonify(gs)
