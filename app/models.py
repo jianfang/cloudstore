@@ -175,7 +175,7 @@ class Post(db.Document):
 
     @staticmethod
     def add_post(user, idol, body, photo):
-        post = Post(id=0, title='', body=body, author=user.mongo_id, idol=idol.mongo_id, photo=photo)
+        post = Post(id=0, title='', text=body, author=user.mongo_id, idol=idol.mongo_id, photo=photo)
         post.save()
         user.posts.append(post.mongo_id)
         user.save()
