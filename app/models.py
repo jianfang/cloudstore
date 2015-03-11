@@ -193,6 +193,7 @@ class Post(db.Document):
         json_post = {
             'id': str(self.mongo_id),
             'url': url_for('api.get_post', id=str(self.mongo_id), _external=True),
+            'idol': str(self.idol),
             'title': self.title,
             'text': self.text,
             'photo': self.photo,
