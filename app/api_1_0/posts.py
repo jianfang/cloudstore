@@ -1,7 +1,7 @@
 __author__ = 'jfang'
 
 from bson import ObjectId
-from flask import request, jsonify
+from flask import request, jsonify, current_app
 from ..models import Post
 from . import api
 
@@ -18,11 +18,23 @@ from . import api
 
 @api.route('/posts/', methods=['GET'])
 def get_posts():
-    posts = []
-    for post in Post.query.filter():
-        if post is not None:
-            posts.append(post.to_json())
-    return jsonify({'posts': posts})
+    page = request.args.get('page', 1, type=int)
+    pagination = Post.query.paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'], error_out=False)
+    posts = pagination.items
+    prev = None
+    if pagination.has_prev:
+        prev = page-1
+    next = None
+    if pagination.has_next:
+        next = page+1
+    return jsonify({
+        'posts': [post.to_json() for post in posts],
+        'prev': prev,
+        'next': next,
+        'count': pagination.total,
+        'pages': pagination.pages
+    })
+
 
 @api.route('/posts/<id>', methods=['GET'])
 def get_post(id):
