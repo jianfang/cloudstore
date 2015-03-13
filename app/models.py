@@ -78,6 +78,7 @@ class User(db.Document):
     confirmed = db.BoolField()
 
     # optional fields
+    avatar = db.StringField(required=False)
     phone = db.StringField(required=False)
     followed = db.ListField(db.SRefField(Idol), default_empty=True)
     posts = db.ListField(db.SRefField(Post), default_empty=True)
@@ -158,6 +159,7 @@ class User(db.Document):
             'id': str(self.mongo_id),
             'url': url_for('api.get_user', id=str(self.mongo_id), _external=True),
             'username': self.username,
+            'avatar': self.avatar,
             'followed': [str(f) for f in self.followed]
         }
         return json_user
@@ -201,9 +203,14 @@ class Post(db.Document):
             'create_at': self.timestamp,
             'author': {
                 'id': str(self.author),
-                'name': author.username
+                'name': author.username,
+                'avatar': author.avatar
             },
-            'comment_count': len(self.comments)
+            'comments': {
+                'count': len(self.comments),
+                'comment': [
+                ]
+            }
         }
         return json_post
 
@@ -230,9 +237,10 @@ class Comment(db.Document):
         return Comment.query.filter(Comment.mongo_id==cid).first()
 
     def to_json(self):
+        author = User.get_user(self.author)
         json_comment = {
             'body': self.body,
             'create_at': self.timestamp,
-            'author': str(self.author)
+            'author': author.to_json()
         }
         return json_comment

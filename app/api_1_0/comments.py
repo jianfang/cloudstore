@@ -20,3 +20,13 @@ def new_post_comment(id):
         if user is not None:
             comment = Comment.add_comment(user, post, body)
     return jsonify({'status': 'done'})
+
+
+@api.route('/comments/<id>', methods=['GET'])
+def get_comment(id):
+    cid = ObjectId(str(id))
+    comment = Comment.get_comment(cid)
+    if comment is not None:
+        return jsonify(comment.to_json())
+
+
