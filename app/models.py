@@ -81,6 +81,7 @@ class User(db.Document):
     phone = db.StringField(required=False)
     followed = db.ListField(db.SRefField(Idol), default_empty=True)
     posts = db.ListField(db.SRefField(Post), default_empty=True)
+    comments = db.ListField(db.SRefField(Comment), default_empty=True)
 
     # index
     #email_index = Index().descending('email').unique()
