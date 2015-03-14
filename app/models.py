@@ -164,6 +164,14 @@ class User(db.Document):
         }
         return json_user
 
+    def to_json_simple(self):
+        json_user = {
+            'id': str(self.mongo_id),
+            'name': self.username,
+            'avatar': self.avatar,
+        }
+        return json_user
+
 
 class Post(db.Document):
     # fields
@@ -201,11 +209,7 @@ class Post(db.Document):
             'text': self.text,
             'photo': self.photo,
             'create_at': str(self.timestamp),
-            'author': {
-                'id': str(self.author),
-                'name': author.username,
-                'avatar': author.avatar
-            },
+            'author': author.to_json_simple(),
             'comments': {
                 'count': len(self.comments),
                 'comment': [
@@ -221,6 +225,7 @@ class Comment(db.Document):
     body = db.StringField()
     timestamp = db.CreatedField()
     author = db.SRefField(User)
+    post = db.SRefField(Post)
 
     @staticmethod
     def add_comment(user, post, body):
@@ -239,8 +244,10 @@ class Comment(db.Document):
     def to_json(self):
         author = User.get_user(self.author)
         json_comment = {
+            'id': str(self.mongo_id),
             'body': self.body,
             'create_at': str(self.timestamp),
-            'author': author.to_json()
+            'author': author.to_json_simple(),
+            'post': str(self.post)
         }
         return json_comment
