@@ -2,7 +2,7 @@ __author__ = 'jfang'
 
 from bson import ObjectId
 from flask import request, jsonify, current_app
-from ..models import Post
+from ..models import Post, Comment
 from . import api
 
 # @api.route('/users/<id>/posts/', methods=['POST'])
@@ -44,5 +44,21 @@ def get_post(id):
         return jsonify(post.to_json())
 
 
+@api.route('/posts/<id>/comments/', methods=['GET'])
+def get_post_comments(id):
+    gs = {}
+    g = {}
+    pid = ObjectId(str(id))
+    post = Post.get_post(pid)
+    comments = []
+    if post is not None:
+        for c in post.comments:
+            cid = ObjectId(str(c))
+            comment = Comment.get_comment(cid)
+            comments.append(comment.to_json())
+    g['comment'] = comments
+    gs['comments'] = g
+    gs['stat'] = 'ok'
+    return jsonify(gs)
 
 

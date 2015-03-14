@@ -42,7 +42,7 @@ https://hostname:5000/api/v1/posts/<int:id> (DELETE)
 
 
 Comment
-https://hostname:5000/api/v1/posts/<int:id>/comments/ (GET)
+https://hostname:5000/api/v1/posts/<id>/comments/ (GET)
 https://hostname:5000/api/v1/comments/<int:id> (GET)
 https://hostname:5000/api/v1/posts/<id>/comment?author=&body= (POST)
 https://hostname:5000/api/v1/comments/<int:id> (PUT) ?

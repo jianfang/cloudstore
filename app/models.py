@@ -200,7 +200,7 @@ class Post(db.Document):
             'title': self.title,
             'text': self.text,
             'photo': self.photo,
-            'create_at': self.timestamp,
+            'create_at': str(self.timestamp),
             'author': {
                 'id': str(self.author),
                 'name': author.username,
@@ -240,7 +240,7 @@ class Comment(db.Document):
         author = User.get_user(self.author)
         json_comment = {
             'body': self.body,
-            'create_at': self.timestamp,
+            'create_at': str(self.timestamp),
             'author': author.to_json()
         }
         return json_comment
