@@ -229,7 +229,7 @@ class Comment(db.Document):
 
     @staticmethod
     def add_comment(user, post, body):
-        comment = Comment(id=0, body=body, author=user.mongo_id)
+        comment = Comment(id=0, body=body, post=post.mongo_id, author=user.mongo_id)
         comment.save()
         user.comments.append(comment.mongo_id)
         user.save()
