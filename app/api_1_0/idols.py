@@ -50,6 +50,7 @@ def get_idol(id):
 
 @api.route('/idols/<id>/posts/', methods=['GET'])
 def get_idol_posts(id):
+    page = request.args.get('page', 1, type=int)
     gs = {}
     g = {}
     posts = []

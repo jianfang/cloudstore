@@ -5,22 +5,17 @@ from flask import request, jsonify, current_app
 from ..models import Post, Comment
 from . import api
 
-# @api.route('/users/<id>/posts/', methods=['POST'])
-# def add_post(id):
-#     uid = ObjectId(str(id))
-#     dict = request.args
-#     #print(dict)
-#     title = dict['title']
-#     body = dict['body']
-#     new_post = Post.add_post(uid, title, body)
-#     if new_post is not None:
-#         return jsonify({'post_id': str(new_post.mongo_id), 'status': 'done'})
 
 @api.route('/posts/', methods=['GET'])
 def get_posts():
     page = request.args.get('page', 1, type=int)
-    pagination = Post.query.paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'], error_out=False)
-    posts = pagination.items
+    idol = request.args.get('idol', '', type=str)
+    if idol == '':
+        pagination = Post.query.paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'], error_out=False)
+        posts = pagination.items
+    else:
+        pagination = Post.query.get_posts_for_idol(idol).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'], error_out=False)
+        posts = pagination.items
     prev = None
     if pagination.has_prev:
         prev = page-1

@@ -1,9 +1,11 @@
 __author__ = 'sid'
 
+from bson import ObjectId
 from flask import url_for, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from mongoalchemy.document import Index
+from flask.ext.mongoalchemy import BaseQuery
 from flask.ext.mongoalchemy import MongoAlchemy
 from flask.ext.login import UserMixin, AnonymousUserMixin
 from app.exceptions import ValidationError
@@ -172,8 +174,15 @@ class User(db.Document):
         }
         return json_user
 
+class MyCustomizedQuery(BaseQuery):
+
+    def get_posts_for_idol(self, idol):
+        return self.filter(self.type.idol == ObjectId(idol))
+
 
 class Post(db.Document):
+    query_class = MyCustomizedQuery
+
     # fields
     id = db.IntField()
     title = db.StringField()

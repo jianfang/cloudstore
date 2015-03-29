@@ -35,6 +35,7 @@ https://hostname:5000/api/v1/idols/<int:id> (DELETE)
 
 Post
 https://hostname:5000/api/v1/posts/ (GET)
+https://hostname:5000/api/v1/posts/?idol= (GET)
 https://hostname:5000/api/v1/users/<int:id>/posts/ (GET)
 https://hostname:5000/api/v1/posts/<int:id> (GET)
 https://hostname:5000/api/v1/posts/<int:id> (PUT)
