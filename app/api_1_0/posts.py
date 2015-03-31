@@ -25,11 +25,14 @@ def get_posts():
     if pagination.has_next:
         next = page+1
     return jsonify({
-        'posts': [post.to_json() for post in posts],
-        'prev': prev,
-        'next': next,
-        'count': pagination.total,
-        'pages': pagination.pages
+        'posts': {
+            'post': [post.to_json() for post in posts],
+            'prev': prev,
+            'next': next,
+            'count': pagination.total,
+            'pages': pagination.pages
+        },
+        'stat': 'ok'
     })
 
 
