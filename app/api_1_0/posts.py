@@ -1,22 +1,54 @@
 __author__ = 'jfang'
 
+
+from datetime import datetime, timedelta, tzinfo
 from bson import ObjectId
 from mongoalchemy.query_expression import QueryField
 from flask import request, jsonify, current_app
-from ..models import Post, Comment
+from ..models import Idol, Post, Comment
 from . import api
+
+class ShanghaiTimeZone(tzinfo):
+    def utcoffset(self, dt):
+        return timedelta(hours=8)
+    def dst(self, dt):
+        return timedelta(hours=0)
+
+class utcTimeZone(tzinfo):
+    def utcoffset(self, dt):
+        return timedelta(hours=0)
+    def dst(self, dt):
+        return timedelta(hours=0)
+
+def is_updated(time, refresh_time):
+    if refresh_time == '':
+        return False
+    refresh = datetime.strptime(refresh_time, '%Y-%m-%d %H:%M:%S').replace(tzinfo=ShanghaiTimeZone())
+    time = time.replace(tzinfo=utcTimeZone())
+    return time < refresh
 
 
 @api.route('/posts/', methods=['GET'])
 def get_posts():
+    last_refresh = request.args.get('last_refresh', '', type=str)
     page = request.args.get('page', 1, type=int)
-    idol = request.args.get('idol', '', type=str)
+    idol_id = request.args.get('idol', '', type=str)
     time_field = QueryField(Post.timestamp)
-    if idol == '':
+    if idol_id == '':
         pagination = Post.query.descending(time_field).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'], error_out=False)
         posts = pagination.items
     else:
-        pagination = Post.query.get_posts_for_idol(idol).descending(time_field).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'], error_out=False)
+        idol = Idol.get_idol(idol_id)
+        if idol:
+            if is_updated(idol.last_posted, last_refresh):
+                return jsonify({
+                   'posts': {
+                        'count': 0
+                    },
+                    'stat': 'ok'
+                })
+
+        pagination = Post.query.get_posts_for_idol(idol_id).descending(time_field).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'], error_out=False)
         posts = pagination.items
     prev = None
     if pagination.has_prev:

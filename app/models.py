@@ -1,5 +1,6 @@
 __author__ = 'sid'
 
+from datetime import datetime
 from bson import ObjectId
 from flask import url_for, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -30,6 +31,7 @@ class Idol(db.Document):
     birthday = db.DateTimeField()
     time_added = db.CreatedField()
     avatar = db.StringField()
+    last_posted = db.DateTimeField()
 
     # optional fields
     posts = db.ListField(db.SRefField(Post), default_empty=True)
@@ -41,7 +43,6 @@ class Idol(db.Document):
     @staticmethod
     def add_idol(name, stage_name, birthday, avatar):
         id = 0
-        from datetime import datetime
         date_object = datetime.strptime(birthday, '%Y/%m/%d')
         idol = Idol(id=id, name=name, stage_name=stage_name,
                     birthday=date_object, avatar=avatar)
@@ -54,9 +55,15 @@ class Idol(db.Document):
             raise ValidationError('Idol already exists.', 'IDOL_ALREADY_EXISTS')
 
     @staticmethod
-    def get_idol(iid):
+    def get_idol(id):
+        iid = ObjectId(str(id))
         idol = Idol.query.filter(Idol.mongo_id == iid).first()
         return idol
+
+    def add_post(self, post):
+        self.posts.append(post.mongo_id)
+        self.last_posted = datetime.utcnow()
+        self.save()
 
     def to_json(self):
         json_idol = {
@@ -199,8 +206,7 @@ class Post(db.Document):
         post.save()
         user.posts.append(post.mongo_id)
         user.save()
-        idol.posts.append(post.mongo_id)
-        idol.save()
+        idol.add_post(post)
         return post
 
     @staticmethod

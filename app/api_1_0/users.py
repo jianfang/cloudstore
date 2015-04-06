@@ -34,8 +34,7 @@ def get_user(id):
 def follow(id):
     dict = request.values
     idol_id = dict['idol']
-    iid = ObjectId(idol_id)
-    idol = Idol.get_idol(iid)
+    idol = Idol.get_idol(idol_id)
     if idol is not None:
         uid = ObjectId(str(id))
         user = User.get_user(uid)
@@ -55,8 +54,7 @@ def follow(id):
 def unfollow(id):
     dict = request.values
     idol_id = dict['idol']
-    iid = ObjectId(idol_id)
-    idol = Idol.get_idol(iid)
+    idol = Idol.get_idol(idol_id)
     if idol is not None:
         uid = ObjectId(str(id))
         user = User.get_user(uid)
@@ -76,8 +74,7 @@ def unfollow(id):
 def add_post(id):
     dict = request.values
     idol_id = dict['idol']
-    iid = ObjectId(idol_id)
-    idol = Idol.get_idol(iid)
+    idol = Idol.get_idol(idol_id)
     if idol is not None:
         uid = ObjectId(str(id))
         user = User.get_user(uid)

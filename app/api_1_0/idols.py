@@ -38,8 +38,7 @@ def get_idol(id):
     gs = {}
     g = {}
     idols = []
-    iid = ObjectId(str(id))
-    idol = Idol.get_idol(iid)
+    idol = Idol.get_idol(id)
     if idol is not None:
         idols.append(idol.to_json())
     g['idol'] = idols
@@ -54,8 +53,7 @@ def get_idol_posts(id):
     gs = {}
     g = {}
     posts = []
-    iid = ObjectId(str(id))
-    idol = Idol.get_idol(iid)
+    idol = Idol.get_idol(id)
     if idol is not None:
         for p in idol.posts:
             pid = ObjectId(str(p))
