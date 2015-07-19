@@ -9,14 +9,22 @@ from ..models import Idol, Post, Comment
 from . import api
 
 class ShanghaiTimeZone(tzinfo):
+    def tzname(self, dt):
+        return 'Shanghai'
+
     def utcoffset(self, dt):
         return timedelta(hours=8)
+
     def dst(self, dt):
         return timedelta(hours=0)
 
-class utcTimeZone(tzinfo):
+class UtcTimeZone(tzinfo):
+    def tzname(self, dt):
+        return 'UTC'
+
     def utcoffset(self, dt):
         return timedelta(hours=0)
+
     def dst(self, dt):
         return timedelta(hours=0)
 
@@ -24,7 +32,7 @@ def is_updated(time, refresh_time):
     if refresh_time == '':
         return False
     refresh = datetime.strptime(refresh_time, '%Y-%m-%d %H:%M:%S').replace(tzinfo=ShanghaiTimeZone())
-    time = time.replace(tzinfo=utcTimeZone())
+    time = time.replace(tzinfo=UtcTimeZone())
     return time < refresh
 
 
@@ -35,21 +43,20 @@ def get_posts():
     idol_id = request.args.get('idol', '', type=str)
     time_field = QueryField(Post.timestamp)
     if idol_id == '':
+        if is_updated(Post.LAST_POSTED, last_refresh):
+            return jsonify(Post.to_json_no_update())
+
         pagination = Post.query.descending(time_field).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'], error_out=False)
         posts = pagination.items
     else:
         idol = Idol.get_idol(idol_id)
         if idol:
             if is_updated(idol.last_posted, last_refresh):
-                return jsonify({
-                   'posts': {
-                        'count': 0
-                    },
-                    'stat': 'ok'
-                })
+                return jsonify(Post.to_json_no_update())
 
         pagination = Post.query.get_posts_for_idol(idol_id).descending(time_field).paginate(page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'], error_out=False)
         posts = pagination.items
+
     prev = None
     if pagination.has_prev:
         prev = page-1

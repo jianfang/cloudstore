@@ -200,6 +200,19 @@ class Post(db.Document):
     idol = db.SRefField(Idol)
     comments = db.ListField(db.SRefField(Comment), default_empty=True)
 
+    # static members
+    LAST_POSTED = datetime.utcnow()
+
+    @staticmethod
+    def to_json_no_update():
+        json_no_update = {
+            'posts': {
+                        'count': 0
+             },
+            'stat': 'ok'
+        }
+        return json_no_update
+
     @staticmethod
     def add_post(user, idol, body, photo):
         post = Post(id=0, title='', text=body, author=user.mongo_id, idol=idol.mongo_id, photo=photo)
@@ -207,6 +220,7 @@ class Post(db.Document):
         user.posts.append(post.mongo_id)
         user.save()
         idol.add_post(post)
+        Post.LAST_POSTED = datetime.utcnow()
         return post
 
     @staticmethod
